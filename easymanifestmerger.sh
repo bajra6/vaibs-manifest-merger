@@ -2,7 +2,7 @@
 # easymanifestmerger.sh
 
 #important steps before running the sh script
-chmod +x easymanifestmerger.sh raiseReview.sh
+chmod +x easymanifestmerger.sh raiseReview.sh cleanAndRefreshView.sh runPMC.sh
 # jq needs to be preinstalled (its a command line json parser). jq is usually available in the system, so no worries :D
 
 clean_csv() {
@@ -31,16 +31,9 @@ for dir in "${dirs[@]}"; do
     directory_versions["$dir"]="$version"
 done
 
-# 5. Ask if codeline view exists
-read -p "Does the codeline view already exist? (yes/no): " view_exists
-
-if [[ "$view_exists" == "yes" ]]; then
-    read -p "Enter the existing view name: " view_name
-else
-    view_name="manifest_bot_view"
-    ade destroyview manifest_bot_view -no_ask -force
-    ade createview manifest_bot_view -latest -series "$codeline"
-fi
+view_name="manifest_bot_view"
+ade destroyview manifest_bot_view -no_ask -force
+ade createview manifest_bot_view -latest -series "$codeline"
 
 # Store data into variables
 codeline_var="$codeline"
@@ -61,4 +54,20 @@ echo "Directory versions: $directory_versions_var"
 echo "View name: $view_name_var"
 
 # Pass data to raiseReview.sh
-ade useview manifest_bot_view -exec "bash /home/vaibs/'gemini bot'/raiseReview.sh $codeline_var $bug_numbers_var $directory_names_var $directory_versions_var $view_name_var"
+# ade useview manifest_bot_view -exec "bash /home/vaibs/'gemini bot'/raiseReview.sh $codeline_var $bug_numbers_var $directory_names_var $directory_versions_var $view_name_var"
+
+
+if ade useview manifest_bot_view -exec "bash /home/vaibs/'gemini bot'/raiseReview.sh $codeline_var $bug_numbers_var $directory_names_var $directory_versions_var $view_name_var"; then
+  # clean and refresh view
+  ade useview manifest_bot_view -exec "bash /home/vaibs/'gemini bot'/cleanAndRefreshView.sh"
+
+  # Pick the first bug number to pass to PMC
+  IFS=',' read -ra bugs <<< "$bug_numbers_var"
+  first_bug="${bugs[0]}"
+
+  # run pmc
+  ade useview manifest_bot_view -exec "bash /home/vaibs/'gemini bot'/runPMC.sh $first_bug $directory_names_var"
+
+else
+  echo "Raising orareview failed. Please check logs"
+fi
