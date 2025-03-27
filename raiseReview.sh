@@ -7,7 +7,7 @@ directory_names="$3"
 directory_versions="$4"
 view_name="$5"
 
-echo "========================================================================="
+echo "========================================================================================================="
 
 echo "Tadaa inside raiseReview.sh"
 
@@ -16,18 +16,19 @@ echo "Bug numbers: $bug_numbers"
 echo "Directory names: $directory_names"
 echo "Directory versions: $directory_versions"
 echo "View name: $view_name"
+echo "========================================================================================================="
 
 # Step 1: Process bug numbers
 IFS=',' read -ra bugs <<< "$bug_numbers"
 
 # 1.a: Pick the first bug number and begin the transaction
 first_bug="${bugs[0]}"
-echo "running ade begintrans -bug $first_bug -no_restore"
+echo "Running command - ade begintrans -bug $first_bug -no_restore"
 ade begintrans -bug "$first_bug" -no_restore
 
 # 1.b: Process the rest of the bug numbers
 for ((i=1; i<${#bugs[@]}; i++)); do
-    echo "ade settransproperty -p BUG_NUM -v ${bugs[$i]}"
+    echo "Running command - ade settransproperty -p BUG_NUM -v ${bugs[$i]}"
     ade settransproperty -p BUG_NUM -v "${bugs[$i]}"
 done
 
@@ -62,8 +63,15 @@ for dir in "${dirs[@]}"; do
     fi
 done
 
+echo "========================================================================================================="
+echo "All necessary changes to manifest files are done! Now we check in all files, save transaction and raise orareview"
+echo "========================================================================================================="
+
+
 # Step 4: Check in and save transaction
+echo "Running command - ade ci -all"
 ade ci -all
+echo "Running command - ade savetrans"
 ade savetrans
 
 # Step 5: Prepare and raise ORAREVIEW
@@ -76,11 +84,16 @@ transaction contains latest manifest versions"
 
 echo "$ORAREVIEW_DESCRIPTION" > /tmp/bot_orareview.txt
 
-echo "Running command: orareview -u -r vkaimal -H /tmp/bot_orareview.txt"
+echo "Running command - orareview -u -r vkaimal -H /tmp/bot_orareview.txt"
 orareview -u -r vkaimal -H /tmp/bot_orareview.txt
 
 # Clean up temporary file
 rm /tmp/bot_orareview.txt
 
+
+
+echo "========================================================================================================="
+echo "Raise ORAREVIEW script complete"
+echo "========================================================================================================="
 
 # to test: bash raiseReview.sh bronze 123,456,789 oracle_hcm_documentrecordsUI,oracle_hcm_workforcedirectorypublicUI 101,102 viewname
