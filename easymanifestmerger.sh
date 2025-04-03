@@ -1,8 +1,15 @@
 #!/bin/bash
 # easymanifestmerger.sh
 
+# Hey folks, I've created this super simple bot that allows you to merge manifests in any repo you want, in any codeline you want.
+# I've taken inspiration from other manifests mergers created by @laayyade and @harjeets - Thanks to their hard work.
+# Hope this project saves a lot of time for you :D
+
+
+BASE_DIR=$(dirname $(realpath $0))
+
 #important steps before running the sh script
-chmod +x easymanifestmerger.sh raiseReview.sh cleanAndRefreshView.sh runPMC.sh
+# chmod +x easymanifestmerger.sh raiseReview.sh cleanAndRefreshView.sh runPMC.sh
 # jq needs to be preinstalled (its a command line json parser). jq is usually available in the system, so no worries :D
 # Set BUGDB_USERID and BUGDB_PASSWORD in bashrc. For example, run ```nano ~/.bashrc``` then add ```export VARIABLE_NAME="value"``` inside it. finally, run ```source ~/.bashrc``` to apply your changes
 # make sure you've filled all required fields in the bug db to prevent bug validation failure
@@ -26,7 +33,7 @@ bug_numbers_var=$(clean_csv "$bug_numbers")
 IFS=',' read -r -a bugs <<< "$bug_numbers_var"
 
 # 3. Get directory names as comma-separated values (and trim spaces)
-read -p "Enter directory names (comma-separated): " directory_names
+read -p "Enter directory names (comma-separated)[oracle_hcm_documentrecordsUI, oracle_hcm_documentrecordspublicUI, etc]: " directory_names
 directory_names_var=$(clean_csv "$directory_names")
 IFS=',' read -r -a dirs <<< "$directory_names_var"
 
@@ -76,16 +83,16 @@ echo "==========================================================================
 echo "We are now starting the ORAREVIEW PROCESS"
 echo "========================================================================================================="
 
-if ade useview manifest_bot_view -exec "bash /home/vaibs/'gemini bot'/raiseReview.sh $codeline_var $bug_numbers_var $directory_names_var $directory_versions_var $view_name_var"; then
+if ade useview manifest_bot_view -exec "bash $BASE_DIR/'gemini bot'/raiseReview.sh $codeline_var $bug_numbers_var $directory_names_var $directory_versions_var $view_name_var"; then
   # clean and refresh view
-  ade useview manifest_bot_view -exec "bash /home/vaibs/'gemini bot'/cleanAndRefreshView.sh"
+  ade useview manifest_bot_view -exec "bash $BASE_DIR/'gemini bot'/cleanAndRefreshView.sh"
 
   # Pick the first bug number to pass to PMC
   IFS=',' read -ra bugs <<< "$bug_numbers_var"
   first_bug="${bugs[0]}"
 
   # run pmc
-  ade useview manifest_bot_view -exec "bash /home/vaibs/'gemini bot'/runPMC.sh $first_bug $directory_names_var"
+  ade useview manifest_bot_view -exec "bash $BASE_DIR/'gemini bot'/runPMC.sh $first_bug $directory_names_var"
 
   echo "========================================================================================================="
   echo "The scripts have all run. Kindly check once if everything is in place. If everything seems alright and all approvals are done, go ahead with your merge. May your day be filled with happy @vaibs"

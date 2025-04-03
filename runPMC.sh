@@ -3,6 +3,8 @@
 bug="$1"
 repositories="$2"
 
+BASE_DIR=$(dirname $(realpath $0))
+
 echo "========================================================================================================="
 echo "Now we begin the Pre-Merge Checker. Pray god (if you believe in one) that this doesn't fail, it'd be a hassle to run it again."
 echo "========================================================================================================="
@@ -40,8 +42,8 @@ if [ -n "$repositories" ]; then
   IFS=',' read -ra REPOS <<< "$repositories"
   for repo in "${REPOS[@]}"; do
     repo_output="/tmp/validationExtenstion_${repo}_output.log"
-    echo "Running command - sh /home/vaibs/valExtD.sh -e $repo > $repo_output 2>&1"
-    sh /home/vaibs/valExtD.sh -e "$repo" > "$repo_output" 2>&1
+    echo "Running command - sh $BASE_DIR/valExtD.sh -e $repo > $repo_output 2>&1"
+    sh $BASE_DIR/valExtD.sh -e "$repo" > "$repo_output" 2>&1
     echo "Running command - $HCMDEV_ROOT/bin/update_bugdb -u $BUGDB_USERID -p $BUGDB_PASSWORD -b $bug -f $repo_output"
     $HCMDEV_ROOT/bin/update_bugdb -u "$BUGDB_USERID" -p "$BUGDB_PASSWORD" -b "$bug" -f "$repo_output"
   done
@@ -49,6 +51,6 @@ fi
 
 
 echo "Raising Merge Request"
-echo "Running command - mergereq -y"
-mergereq -y
+echo "Running command - mergereq -y -m vkaimal"
+mergereq -y -m vkaimal
 
