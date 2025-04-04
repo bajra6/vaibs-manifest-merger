@@ -83,16 +83,16 @@ echo "==========================================================================
 echo "We are now starting the ORAREVIEW PROCESS"
 echo "========================================================================================================="
 
-if ade useview manifest_bot_view -exec "bash $BASE_DIR/'gemini bot'/raiseReview.sh $codeline_var $bug_numbers_var $directory_names_var $directory_versions_var $view_name_var"; then
+if ade useview manifest_bot_view -exec "bash $BASE_DIR/raiseReview.sh $codeline_var $bug_numbers_var $directory_names_var $directory_versions_var $view_name_var"; then
   # clean and refresh view
-  ade useview manifest_bot_view -exec "bash $BASE_DIR/'gemini bot'/cleanAndRefreshView.sh"
+  ade useview manifest_bot_view -exec "bash $BASE_DIR/cleanAndRefreshView.sh"
 
   # Pick the first bug number to pass to PMC
   IFS=',' read -ra bugs <<< "$bug_numbers_var"
   first_bug="${bugs[0]}"
 
   # run pmc
-  ade useview manifest_bot_view -exec "bash $BASE_DIR/'gemini bot'/runPMC.sh $first_bug $directory_names_var"
+  ade useview manifest_bot_view -exec "bash $BASE_DIR/runPMC.sh $first_bug $directory_names_var"
 
   echo "========================================================================================================="
   echo "The scripts have all run. Kindly check once if everything is in place. If everything seems alright and all approvals are done, go ahead with your merge. May your day be filled with happy @vaibs"
