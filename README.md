@@ -7,4 +7,4 @@ A manifest merge bot to help reduce the mundane tasks performed by super awesome
 - Set BUGDB_USERID and BUGDB_PASSWORD in bashrc. For example, run ```nano ~/.bashrc``` then add ```export VARIABLE_NAME="value"``` inside it. finally, run ```source ~/.bashrc``` to apply your changes
 - make sure you've filled all required fields in the bug db to prevent bug validation failure
 
-# The entry point is ```easymanifestmerger.sh``` so to start the bot, run "```sh easymanifestmerger.sh```"
+### The entry point is ```_easymanifestmerger.sh_``` so to start the bot, run "```_sh easymanifestmerger.sh_```"
