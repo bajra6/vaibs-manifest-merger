@@ -43,7 +43,7 @@ if [ -n "$repositories" ]; then
   for repo in "${REPOS[@]}"; do
     repo_output="/tmp/validationExtenstion_${repo}_output.log"
     echo "Running command - sh $BASE_DIR/valExtD.sh -e $repo > $repo_output 2>&1"
-    sh $BASE_DIR/valExtD.sh -e "$repo" > "$repo_output" 2>&1
+    sh $BASE_DIR/valExtD.sh -e "$repo" 2>&1 | sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?m//g' > "$repo_output"
     echo "Running command - $HCMDEV_ROOT/bin/update_bugdb -u $BUGDB_USERID -p $BUGDB_PASSWORD -b $bug -f $repo_output"
     $HCMDEV_ROOT/bin/update_bugdb -u "$BUGDB_USERID" -p "$BUGDB_PASSWORD" -b "$bug" -f "$repo_output"
   done

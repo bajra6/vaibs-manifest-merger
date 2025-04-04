@@ -84,7 +84,7 @@ transaction contains latest manifest versions"
 
 echo "$ORAREVIEW_DESCRIPTION" > /tmp/bot_orareview.txt
 
-echo "Running command - orareview -u -r vkaimal -H /tmp/bot_orareview.txt"
+echo "Running command - orareview -u -r vkaimal,assingsi -H /tmp/bot_orareview.txt"
 orareview -u -r vkaimal,assingsi -H /tmp/bot_orareview.txt
 
 # Clean up temporary file
